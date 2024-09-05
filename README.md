@@ -1,1 +1,2 @@
-# vinyl-shop
+# The Vinyl Vault
+
