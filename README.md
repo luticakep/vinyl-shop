@@ -63,7 +63,7 @@ python manage.py startapp main
 This code is used to display values in variables that have been defined before. 
 
 5. Open `views.py` in main application and add the following code.
-```
+```py
 from django.shortcuts import render
 
 def show_main(request):
@@ -81,7 +81,7 @@ As I explained in the previous step, this code has a dictionary(context) which h
 1. Open `models.py` in the main directory application.
 
 2. Fill the file with the following code.
-```
+```py
 from django.db import models
 
 class Product(models.Model):
@@ -100,7 +100,7 @@ Explanation:
 
 #### Step 5: Configuring URL for the main application
 1. Create `urls.py` inside the `main` directory and fill with this.
-```
+```py
 from django.urls import path
 from main.views import show_main
 
@@ -114,7 +114,7 @@ Inside the `urlpatterns`, `path` is used to define the URL pattern and `show_mai
 
 #### Step 6: Configuring the project URL
 1. Open `urls.py` inside `vinyl_shop` directory
-```
+```py
 from django.contrib import admin
 from django.urls import path, include
 
@@ -128,7 +128,10 @@ In the code above, `include` is used to import URL from other apps. The URL path
 ### Client request flow
 
 ### Git in software development
+When developing software, Git is essential. Software developers use it extensively because it makes it simple for them to collaborate, manage code across branches, and keep track of changes. Git keeps track of every commit we make, enabling developers to view their earlier versions of the code. To improve teamwork, Git also connects with local repositories. 
 
 ### Why using Django for learning software development?
+Pyhton serves as the foundation for Django, making it an excellent starting point for those new to web frameworks. It has clear documentation, which is crucial for learners. Additionally, other frameworks (like Spring Boot, Flask, etc.) require more setup and lack built-in features, while others have extensive configuration and a steep learning curve. Therefore, Django is perfect for beginners to learn software development.
 
-### Django as an ORM
+### Django model as an ORM
+Django model is called Object Relational Mapping (ORM) because it can be used to interact with data from various relational databases such as SQLite, PostgreSQL, MySQL, and Oracle. Using an ORM API, Django enables us to add, remove, modify, and query objects. It allows you to work with your data more intuitively by mapping your Python classes to database tables. This simplifies and streamlines database management and querying.
