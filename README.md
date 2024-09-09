@@ -2,7 +2,7 @@
 
 ## Assignment 2
 
-Click here to see my app
+https://kayla-soraya-vinylshop.pbp.cs.ui.ac.id
 
 ### Steps
 #### Step 1: Creating virtual environment
@@ -126,6 +126,9 @@ urlpatterns = [
 In the code above, `include` is used to import URL from other apps. The URL path is an empty string because we want to access the main page directly
 
 ### Client request flow
+<img src="/pictures/diagram.png">
+
+The client sends a request to the server by using a URL and then Django recieves the request to `urls.py` to match the requested one. `views.py` is used to call the corresponding function that matches the URL and process it to the databases. If data manipulation is needed, then Django's ORM,`models.py`, is used to interact with the database. After the processing is done, `template` or the HTML will generate the final content by sending it as an HTTP response to the client.
 
 ### Git in software development
 When developing software, Git is essential. Software developers use it extensively because it makes it simple for them to collaborate, manage code across branches, and keep track of changes. Git keeps track of every commit we make, enabling developers to view their earlier versions of the code. To improve teamwork, Git also connects with local repositories. 
