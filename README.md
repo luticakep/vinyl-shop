@@ -2,7 +2,7 @@
 
 ## Assignment 2
 
-https://kayla-soraya-vinylshop.pbp.cs.ui.ac.id
+http://kayla-soraya-vinylshop.pbp.cs.ui.ac.id/
 
 ### Steps
 #### Step 1: Creating virtual environment
