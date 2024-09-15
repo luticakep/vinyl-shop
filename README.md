@@ -95,9 +95,6 @@ Explanation:
 `Product` is the name of model that I use.
 `name`, `price`, `description`, `quantity` are the attributes in the model for my application.
 
-3. 
-
-
 #### Step 5: Configuring URL for the main application
 1. Create `urls.py` inside the `main` directory and fill with this.
 ```py
@@ -138,3 +135,118 @@ Pyhton serves as the foundation for Django, making it an excellent starting poin
 
 ### Django model as an ORM
 Django model is called Object Relational Mapping (ORM) because it can be used to interact with data from various relational databases such as SQLite, PostgreSQL, MySQL, and Oracle. Using an ORM API, Django enables us to add, remove, modify, and query objects. It allows you to work with your data more intuitively by mapping your Python classes to database tables. This simplifies and streamlines database management and querying.
+
+
+## Assignment 3
+
+### Steps
+#### Step 1: Creating form input data
+1. Create a new file `forms.py` in `main` which will consists of the form structure
+```py
+from django.forms import ModelForm
+from main.models import Product
+
+class VinylEntryForm(ModelForm):
+    class Meta:
+        model = Product
+        fields = ["name", "price", "description", "quantity"]
+```
+
+2. In the `views.py` add `from django.shortcuts import render, redirect` and then create a new function for adding the new product.
+```py
+def create_product(request):
+    form = VinylEntryForm(request.POST or None)
+
+    if form.is_valid() and request.method == "POST":
+        form.save()
+        return redirect('main:show_main')
+
+    context = {'form': form}
+    return render(request, "create_product.html", context)
+```
+
+3. After that, we want to show the added product in the main page. Change the `show_main` in `views.py`.
+```py
+def show_main(request):
+    vinyl_entries = Product.objects.all()
+
+    context = {
+        'name': 'Kayla Soraya Djakaria',
+        'class': 'KKI',
+        'product_entries': vinyl_entries,
+    }
+
+    return render(request, "main.html", context)
+```
+
+4. Add the URL path in `urls.py` 
+```py 
+path('create-product', create_product, name='create_product'),
+```
+
+5. Lastly, we need to create a new html file for when we create new product and also add new code in the `main.html` which will display the data in the form.
+
+#### Step 2: Returning Data in XML, JSON, XML by ID, JSON by ID
+1. In the `views.py` and add this.
+```py
+from django.http import HttpResponse
+from django.core import serializers
+```
+
+2. Then we can just add the function for returning data in XML and JSON
+```py
+def show_xml(request):
+    data = Product.objects.all()
+    return HttpResponse(serializers.serialize("xml", data), content_type="application/xml")
+
+def show_json(request):
+    data = Product.objects.all()
+    return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+
+def show_xml_by_id(request, id):
+    data = Product.objects.filter(pk=id)
+    return HttpResponse(serializers.serialize("xml", data), content_type="application/xml")
+
+def show_json_by_id(request, id):
+    data = Product.objects.filter(pk=id)
+    return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+```
+
+#### Step 3: Create URL routing for each views
+1. Open `urls.py` and import the function that we just created.
+```py
+from main.views import show_xml, show_json, show_xml_by_id, show_json_by_id
+```
+
+2. Add the URL path to the `urlpatterns` to access the function that was imported.
+```py
+path('xml/', show_xml, name='show_xml'),
+path('json/', show_json, name='show_json'),
+path('xml/<str:id>/', show_xml_by_id, name='show_xml_by_id'),
+path('json/<str:id>/', show_json_by_id, name='show_json_by_id'),
+```
+
+### Why we need data delivery in implementing a platform?
+Data delivery is important to the platform because it guarantees that the appropriate data is received by the required users and components at the appropriate time. It facilitates real-time access, enables system component coordination, and enhances user experience by delivering accurate, timely information. 
+
+### XML or JSON? Why JSON is more popular than XML?
+I personally think JSON is better than XML since it has more readable syntax. Additionally, JSON is more popular than XML because JSON is more simple and efficient and has better alignment with modern web application.
+
+### `is_valid()` in Django
+The usage of `is_valid()`method in Django, for example `form.is_valid()`, is used to validate the input from the form. We need that method because by using `is_valid()` prevent invalid data processing. If the form data is invalid, this method helps by adding thorough error messages to the form's errors attribute for each field that failed validation.
+
+### `csrf_token` in creating form in Django
+`csrf_token` is a token that functions as a security system and ensures that the form is coming from an actual user. The token is automatically generated by Django to prevent attacks. If we don't use `csrf_token`, attackers could execute unauthorized actions as it was coming from the user and could lead to security breaches. 
+
+### Postman results
+### JSON
+<img src="/pictures/json.png">
+
+### JSON by ID
+<img src="/pictures/json_id.png">
+
+### XML
+<img src="/pictures/xml.png">
+
+### XML by ID
+<img src="/pictures/xml_id.png">
