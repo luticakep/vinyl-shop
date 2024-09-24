@@ -250,3 +250,112 @@ The usage of `is_valid()`method in Django, for example `form.is_valid()`, is use
 
 ### XML by ID
 <img src="/pictures/xml_id.png">
+
+
+## Assignment 4
+
+### Steps
+#### Step 1: Register, login, logout
+1. In the `views.py`, I created several functions that's used to register, login, and logout to the application. I also imported `UserCreationForm` which is a built in form and `messages` to give messages after the user successfully create an account. 
+```py
+def register(request):
+    form = UserCreationForm()
+
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your account has been successfully created!')
+            return redirect('main:login')
+    context = {'form':form}
+    return render(request, 'register.html', context)
+
+def login_user(request):
+   if request.method == 'POST':
+      form = AuthenticationForm(data=request.POST)
+
+      if form.is_valid():
+        user = form.get_user()
+        login(request, user)
+        response = HttpResponseRedirect(reverse("main:show_main"))
+        response.set_cookie('last_login', str(datetime.datetime.now()))
+        return response
+
+   else:
+      form = AuthenticationForm(request)
+   context = {'form': form}
+   return render(request, 'login.html', context)
+
+def logout_user(request):
+    logout(request)
+    response = HttpResponseRedirect(reverse('main:login'))
+    response.delete_cookie('last_login')
+    return response
+```
+2. Since the page for registering, login, and main page is different, I create an additional html page which is `login.html` and `register.html`.
+3. In `urls.py`, add the URL path to access the functions.
+```py
+    path('register/', register, name='register'),
+    path('login/', login_user, name='login'),
+    path('logout/', logout_user, name='logout'),
+```
+4. After we create the login function, when we open the link, it is supposed to be the login page, not the main page. Therefore we need to add this to the top of `show_main` function, so that the main page can only be accessed after the user logs in.
+```py
+@login_required(login_url='/login')
+```
+
+#### Step 2: Connects models `Product` and `User`
+1. Add `from django.contrib.auth.models import User` to the `models.py`.
+2. After that, add this line inside class `Product` to ensure that every models need to have a relationship with a user.
+```py
+user = models.ForeignKey(User, on_delete=models.CASCADE)
+```
+3. Open views.py, modify the code in `create_product`
+```py
+def create_product(request):
+    form = VinylEntryForm(request.POST or None)
+
+    if form.is_valid() and request.method == "POST":
+        vinyl_entry = form.save(commit=False)
+        vinyl_entry.user = request.user
+        vinyl_entry.save()
+        return redirect('main:show_main')
+
+    context = {'form': form}
+    return render(request, "create_product.html", context)
+```
+`form.save(commit=False)` prevents Django from immediately saving the product to database
+
+#### Step 3: Display logged in user details such as username and apply cookies to the application's main page
+1. To display the last login we need to add some changes. In the `show_main` function, add this code snipet inside context variable.
+```py
+'last_login': request.COOKIES['last_login'],
+```
+2. After that, modify the main page and add this at the very last of the code.
+```py
+<h5>Last login session: {{ last_login }}</h5>
+```
+2. In the `show_main`, change the values of `vinyl_entries` and `context`.
+```py
+def show_main(request):
+    vinyl_entries = Product.objects.filter(user=request.user)
+    context = {
+         'name': request.user.username,
+    }
+```
+We filter the `vinyl_entries` so that only products created with the corresponding account will be displayed and the name shown in main page will be the username of the logged-in user.
+
+### Difference between `HttpResponseRedirect()` and `redirect()`
+`HttpResponseRedirect()` can only be a url. While `redirect()` can accept a model, view, or url as its argument. It is easier to use `redirect()` to perform redirects.
+
+### How `Product` model is linked with `User`?
+In Django, model can be linked with a user by using a foreign key. 
+user = models.ForeignKey(User, on_delete=models.CASCADE)
+This will create a one-to-many relationship or one user can have multiple products. 
+
+### Difference between authentication and authorization
+Authentication means the process of verifying a user, while authorization comes after authentication and gives actions that user can access. When a user logs in, Django verifies the user's credentials (authentication), and then store's the session ID in cookie, and then Django will checks what the user is allowed to do (authorization). Django implement authentication by providing a built-in views and forms to handle user login, register, and logout, such as UserCreationForm and LoginView. While for authorization, Django uses User and Group models to control access to views and models, such as @login_required.
+
+### How Django remember logged-in users?
+Django uses session cookies to keep track of users who are currently logged in. Django generates a session ID upon user login and saves it in a cookie. Django will use the ID to confirm the user's identity on each request after that, enabling the user to stay signed in.
+Cookies can also be used as trackers for browsing activity and to keep shopping carts full. But not all cookies are secure; some can be used for malicious intent. Therefore, we require some settings, such as HttpOnly or Secure flags, to secure cookies.
