@@ -1,8 +1,9 @@
 # The Vinyl Vault
 
-## Assignment 2
+[PWS APPLICATION](http://kayla-soraya-vinylshop.pbp.cs.ui.ac.id/)
 
-http://kayla-soraya-vinylshop.pbp.cs.ui.ac.id/
+<details>
+<Summary><b>Assignment 2</b></summary>
 
 ### Steps
 #### Step 1: Creating virtual environment
@@ -135,9 +136,10 @@ Pyhton serves as the foundation for Django, making it an excellent starting poin
 
 ### Django model as an ORM
 Django model is called Object Relational Mapping (ORM) because it can be used to interact with data from various relational databases such as SQLite, PostgreSQL, MySQL, and Oracle. Using an ORM API, Django enables us to add, remove, modify, and query objects. It allows you to work with your data more intuitively by mapping your Python classes to database tables. This simplifies and streamlines database management and querying.
+</details>
 
-
-## Assignment 3
+<details>
+<Summary><b>Assignment 3</b></summary>
 
 ### Steps
 #### Step 1: Creating form input data
@@ -250,9 +252,10 @@ The usage of `is_valid()`method in Django, for example `form.is_valid()`, is use
 
 ### XML by ID
 <img src="/pictures/xml_id.png">
+</details>
 
-
-## Assignment 4
+<details>
+<Summary><b>Assignment 4</b></summary>
 
 ### Steps
 #### Step 1: Register, login, logout
@@ -359,3 +362,4 @@ Authentication means the process of verifying a user, while authorization comes 
 ### How Django remember logged-in users?
 Django uses session cookies to keep track of users who are currently logged in. Django generates a session ID upon user login and saves it in a cookie. Django will use the ID to confirm the user's identity on each request after that, enabling the user to stay signed in.
 Cookies can also be used as trackers for browsing activity and to keep shopping carts full. But not all cookies are secure; some can be used for malicious intent. Therefore, we require some settings, such as HttpOnly or Secure flags, to secure cookies.
+</details>
