@@ -363,3 +363,49 @@ Authentication means the process of verifying a user, while authorization comes 
 Django uses session cookies to keep track of users who are currently logged in. Django generates a session ID upon user login and saves it in a cookie. Django will use the ID to confirm the user's identity on each request after that, enabling the user to stay signed in.
 Cookies can also be used as trackers for browsing activity and to keep shopping carts full. But not all cookies are secure; some can be used for malicious intent. Therefore, we require some settings, such as HttpOnly or Secure flags, to secure cookies.
 </details>
+
+<details>
+<Summary><b>Assignment 5</b></summary>
+
+### Steps
+1. For the edit and delete product, I made the functions with id as the parameter inside `views.py`.
+```py
+def edit_product(request, id):
+    product = Product.objects.get(pk=id)
+    form = VinylEntryForm(request.POST or None, instance=product)
+
+    if form.is_valid() and request.method == "POST":
+        form.save()
+        return HttpResponseRedirect(reverse('main:show_main'))
+
+    context = {'form': form}
+    return render(request, "edit_product.html", context)
+
+def delete_product(request, id):
+    product = Product.objects.get(pk=id)
+    product.delete()
+    return HttpResponseRedirect(reverse('main:show_main'))
+```
+2. For the design, I use Tailwind, and I customize the login, register, main, add product, and edit product pages. I also consider the conditions; if there is no product, it'll show an image and a message. Otherwise, it will show the products inside the product card. Each product card consists of the name of the product, description, price, quantity, and two buttons for edit and delete. For the edit and delete button, I set the position to be at the bottom right of the card. I also created a navigation bar that is responsive to different device sizes.
+
+### Priority order of CSS selectors
+1. Inline styles, the styles which applied directly to an element using `style` attribute.
+2. ID selectors, the styles applied using an element's `id` attribute.
+3. Class selector, example: `.class` and `:hover`
+4. Element selector and pseudo-elements, example: `div`, `p`, `h1`
+5. Universal selector, using `*`
+
+### Why does responsive design become an important concept in web application development?
+Responsive design is an essential part of web applications because it guarantees a website works properly across different screen sizes. Not only that, it improves the user experience and can captrure broader audience(mobile and dekstop user).
+Example of application that have implemented responsive web design: Google, Amazon, Youtube.
+Example of application that have not implemented responsive web design: SCELE, SIAK NG. 
+
+### Difference between margin, border, and padding
+Margin is the outermost space and creates space between each elements. Margin ca be implement for each side of the element(top, right, bottom, left).
+Border wraps around padding and the content and it can have different styles, color, or thickness. We can implement it by defining the style for each or all sides.
+Padding is inside the element's border and creates space between content and the border. Padding has the same implementation like margin.
+
+### The concept and use of flex box and grid layout 
+Flex box is a one-dimensional model for arranging elements in a row or column. This is suits the most for creating navigation bar, item's allignment, and buttons.
+Grid layout allows is a two-dimensional system to arrange items in a grid layout. The use of grid are for full-page website or section with different sizes  of elements. 
+</details>
