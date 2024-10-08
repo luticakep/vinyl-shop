@@ -409,3 +409,199 @@ Padding is inside the element's border and creates space between content and the
 Flex box is a one-dimensional model for arranging elements in a row or column. This is suits the most for creating navigation bar, item's allignment, and buttons.
 Grid layout allows is a two-dimensional system to arrange items in a grid layout. The use of grid are for full-page website or section with different sizes  of elements. 
 </details>
+
+<details>
+<Summary><b>Assignment 5</b></summary>
+
+### Steps
+#### Step 1: Create function to add product with AJAX
+1. In the `views.py`, I create this function
+```py
+@csrf_exempt
+@require_POST
+def create_product_ajax(request):
+    name = strip_tags(request.POST.get("name"))
+    price = request.POST.get("price")
+    description = strip_tags(request.POST.get("description"))
+    quantity = request.POST.get("quantity")
+    user = request.user
+
+    new_product = Product(
+        name=name,
+        price=price,
+        description=description,
+        quantity=quantity,
+        user=user
+    )
+    new_product.save()
+
+    return HttpResponse(b"CREATED", status=201)
+```
+The `strip_tags` is for sanitizing the input data to prevent XSS attack.
+`POST` is used to send data to the server.
+2. In the `urls.py`, add the URL path to access the function.
+```py
+    path('create-product-ajax/', create_product_ajax, name='create_product_ajax'),
+```
+
+#### Step 2: Displaying Product with `fetch()` API
+1. In the `views.py`, I change the first line of show_json and show_xml to filter the data based on the logged in user.
+```py
+data = Product.objects.filter(user=request.user)
+```
+2. In the `main.html`, I remove the line `{% if not product_entries %}` until `{% endif %}` and add this code to display the products.
+```html
+<div id="product_cards"></div>
+```
+3. In the same file, I create a script blog to fetch the data from the server, display it in the product card, and hide the product card.
+```html
+<script>
+    function addProduct() {
+    fetch("{% url 'main:create_product_ajax' %}", {
+      method: "POST",
+      body: new FormData(document.querySelector('#Form')),
+    })
+    .then(response => refreshProduct())
+
+    document.getElementById("Form").reset(); 
+    hideModal();
+
+    return false;
+  }
+
+  async function getProduct(){
+      return fetch("{% url 'main:show_json' %}").then((res) => res.json())
+  }
+  
+  async function refreshProduct() {
+    document.getElementById("product_cards").innerHTML = "";
+    document.getElementById("product_cards").className = "";
+    const Product = await getProduct();
+    let htmlString = "";
+    let classNameString = "";
+
+    if (Product.length === 0) {
+        classNameString = "flex flex-col items-center justify-center min-h-[24rem] p-6";
+        htmlString = `
+            <div class="flex flex-col items-center justify-center min-h-[24rem] p-6">
+                <img src="{% static 'image/no_product.png' %}" alt="Sad face" class="w-32 h-32 mb-4"/>
+                <p class="text-center text-gray-600 mt-4">There is no product in Vinyl Vault.</p>
+            </div>
+        `;
+    }
+    else {
+        classNameString = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full items-stretch"
+        Product.forEach((item) => {
+            const name = DOMPurify.sanitize(item.fields.name);
+            const description = DOMPurify.sanitize(item.fields.description);
+            htmlString += `
+            ...
+            `;
+        });
+    }
+    document.getElementById("product_cards").className = classNameString;
+    document.getElementById("product_cards").innerHTML = htmlString;
+  }
+</script>
+```
+#### Step 3: Creating Modal
+1. In the `main.html`, I create a modal for adding product including its button.
+```html
+  <div id="crudModal" tabindex="-1" aria-hidden="true" class="hidden fixed inset-0 z-50 w-full flex items-center justify-center bg-gray-800 bg-opacity-50 overflow-x-hidden overflow-y-auto transition-opacity duration-300 ease-out">
+    <div id="crudModalContent" class="relative bg-white rounded-lg shadow-lg w-5/6 sm:w-3/4 md:w-1/2 lg:w-1/3 mx-4 sm:mx-0 transform scale-95 opacity-0 transition-transform transition-opacity duration-300 ease-out">
+      <!-- Modal header -->
+      <div class="flex items-center justify-between p-4 border-b rounded-t">
+        <h3 class="text-xl font-semibold text-gray-900">
+          Add Product
+        </h3>
+        <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" id="closeModalBtn">
+          <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+          </svg>
+          <span class="sr-only">Close modal</span>
+        </button>
+      </div>
+      <!-- Modal body -->
+      <div class="px-6 py-4 space-y-6 form-style">
+        <form id="Form">
+          <div class="mb-4">
+            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+            <input type="text" id="name" name="name" class="mt-1 block w-full border border-gray-300 rounded-md p-2 hover:border-amber-900" required>
+          </div>
+          <div class="mb-4">
+            <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
+            <input type="number" id="price" name="price" class="mt-1 block w-full border border-gray-300 rounded-md p-2 hover:border-amber-900" required>
+          </div>
+          <div class="mb-4">
+            <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+            <textarea id="description" name="description" rows="3" class="mt-1 block w-full h-52 resize-none border border-gray-300 rounded-md p-2 hover:border-amber-900 hover:border-2 transition duration-200" required></textarea>
+          </div>
+          <div class="mb-4">
+            <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
+            <input type="number" id="quantity" name="quantity" class="mt-1 block w-full border border-gray-300 rounded-md p-2 hover:border-amber-900" required>
+          </div>
+        </form>
+      </div>
+      <!-- Modal footer -->
+      <div class="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2 p-6 border-t border-gray-200 rounded-b justify-center md:justify-end">
+        <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg" id="cancelButton">Cancel</button>
+        <button type="submit" id="submit" form="Form" class="bg-amber-800 hover:bg-amber-900 text-white font-bold py-2 px-4 rounded-lg">Save</button>
+      </div>
+    </div>
+  </div>
+```
+```html
+<button data-modal-target="crudModal" data-modal-toggle="crudModal" class="btn bg-amber-800 hover:bg-amber-900 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105" onclick="showModal();">
+        Add New Product by AJAX
+      </button>
+```
+
+2. In the same file, I create a script blog to show and hide the modal.
+```html
+<script>
+...
+    const modal = document.getElementById('crudModal');
+    const modalContent = document.getElementById('crudModalContent');
+
+    function showModal() {
+        modal.classList.remove('hidden'); 
+        setTimeout(() => {
+            modalContent.classList.remove('opacity-0', 'scale-95');
+            modalContent.classList.add('opacity-100', 'scale-100');
+        }, 50); 
+    }
+
+    function hideModal() {
+        modalContent.classList.remove('opacity-100', 'scale-100');
+        modalContent.classList.add('opacity-0', 'scale-95');
+
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 150); 
+    }
+
+    document.getElementById("cancelButton").addEventListener("click", hideModal);
+    document.getElementById("closeModalBtn").addEventListener("click", hideModal);
+    document.getElementById("Form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        addProduct();
+    })
+</script>
+```
+
+### Benefits of using JavaScript in developing web applications
+1. Enhancing user experience
+2. Interactivity
+3. Asynchronous communication
+4. Real-time updates
+
+### Why we need to use await when we call fetch()?
+Because `fetch()` is an asynchronous function, it returns a promise. We can wait for the promise to be fulfilled and receive the server's answer by utilizing await. If we don't use await, the response will not be returned.
+
+### The use of `csrf_exempt` decorator on the view used for AJAX POST
+`csrf_exempt` is used to exempt the view from CSRF verification. This is useful when we want to use AJAX POST request to send data to the server. By using `csrf_exempt`, we can bypass the CSRF verification and send the data to the server without any problem.
+
+### Why can't the sanitization be done just in the front-end?
+Sanitization should be done in the back-end because the front-end can be manipulated by the user. The user can get around the sanitization and send dangerous data to the server if we simply perform sanitization on the front end. Thus, in order to guarantee the safety and security of the data, we must do back-end sanitization.
+
+</details>
