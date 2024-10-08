@@ -411,7 +411,7 @@ Grid layout allows is a two-dimensional system to arrange items in a grid layout
 </details>
 
 <details>
-<Summary><b>Assignment 5</b></summary>
+<Summary><b>Assignment 6</b></summary>
 
 ### Steps
 #### Step 1: Create function to add product with AJAX
