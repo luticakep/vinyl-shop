@@ -86,8 +86,11 @@
   }
 
   async function getProduct(){
-      return fetch("{% url 'main:show_json' %}").then((res) => res.json())
+      // Use the fetch API to send a GET request to the URL defined in your Django URLs
+      return fetch("{% url 'main:show_json' %}")
+        .then((res) => res.json())  // After fetching, convert the response to JSON
   }
+  // This function returns a promise that resolves to the data fetched from the server.
   
   async function refreshProduct() {
     document.getElementById("product_cards").innerHTML = "";
